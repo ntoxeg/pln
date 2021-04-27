@@ -9,15 +9,7 @@
 # -- print pretty summary
 #
 
-# cogutils already requires 2.8.12.2, so may as well ask for that.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12.2)
-IF (COMMAND CMAKE_POLICY)
-	CMAKE_POLICY(SET CMP0003 NEW)
-ENDIF (COMMAND CMAKE_POLICY)
-
-IF(CMAKE_VERSION VERSION_GREATER 3.0.2)
-	CMAKE_POLICY(SET CMP0037 OLD)
-ENDIF(CMAKE_VERSION VERSION_GREATER 3.0.2)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
 
 # Project name and version
 PROJECT(pln)
@@ -57,7 +49,7 @@ ADD_DEFINITIONS(-DPROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
 # CogUtil must come first, because it supplies various FindXXX macros.
 
 # Cogutil
-FIND_PACKAGE(CogUtil 2.0.1 CONFIG REQUIRED)
+FIND_PACKAGE(CogUtil 2.0.1 REQUIRED)
 IF (COGUTIL_FOUND)
 	MESSAGE(STATUS "CogUtil version ${COGUTIL_VERSION} found.")
 	ADD_DEFINITIONS(-DHAVE_COGUTIL)
@@ -76,7 +68,7 @@ INCLUDE(Summary)
 # ------------------------------------------------------------
 # The atomspace is required.
 
-FIND_PACKAGE(AtomSpace 5.0.3 CONFIG REQUIRED)
+FIND_PACKAGE(AtomSpace 5.0.3 REQUIRED)
 IF (ATOMSPACE_FOUND)
 	MESSAGE(STATUS "AtomSpace found.")
 	ADD_DEFINITIONS(-DHAVE_ATOMSPACE)
@@ -86,13 +78,14 @@ ELSE (ATOMSPACE_FOUND)
 ENDIF (ATOMSPACE_FOUND)
 
 # ----------------------------------------------------------
-# Python, Guile
+# Python, Cython, Guile
 
-include(OpenCogFindPython)
+find_package(Python 3.4.0 COMPONENTS Interpreter Development)
+find_package(Cython 0.24.0)
 include(OpenCogFindGuile)
 
 # URE
-FIND_PACKAGE(URE 1.0.0 CONFIG REQUIRED)
+FIND_PACKAGE(URE 1.0.0 REQUIRED)
 IF (URE_FOUND)
 	MESSAGE(STATUS "URE found.")
 	ADD_DEFINITIONS(-DHAVE_URE)
@@ -108,12 +101,6 @@ FIND_PACKAGE(Cxxtest)
 IF (NOT CXXTEST_FOUND)
 	MESSAGE(STATUS "CxxTest missing: needed for unit tests.")
 ENDIF (NOT CXXTEST_FOUND)
-
-# ----------------------------------------------------------
-# This is required for Guile, Python and Cython
-
-include(OpenCogFindGuile)
-include(OpenCogFindPython)
 
 # ===================================================================
 # Include configuration.
@@ -229,7 +216,7 @@ INCLUDE(CPack)
 # Show a summary of what we found, what we will do.
 
 SUMMARY_ADD("PLN" "Probabilistic Logic Network" HAVE_PLN)
-SUMMARY_ADD("Cython bindings" "Cython (python) bindings" HAVE_CYTHON)
+SUMMARY_ADD("Cython bindings" "Cython (python) bindings" CYTHON_FOUND)
 SUMMARY_ADD("Unit tests" "Unit tests" CXXTEST_FOUND)
 
 SUMMARY_SHOW()
